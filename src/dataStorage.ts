@@ -2,8 +2,16 @@ import { makeAutoObservable, runInAction } from "mobx";
 
 const apiUrl = "https://gorest.co.in/public-api/users";
 
+type User = {
+    id: number,
+    name: string,
+    email: string,
+    gender: string,
+    status: string,
+}
+
 export class dataStorage {
-  usersData = [];
+  usersData: User[] = [];
   constructor() {
     makeAutoObservable(this);
   }
