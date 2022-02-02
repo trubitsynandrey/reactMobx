@@ -41,13 +41,15 @@ export const UsersView = observer(
       dataStorage.getUsers();
     }, []);
 
+    // console.log(dataStorage.getUserPost)
+
     return (
       <>
         <Container>
           <UsersList>
             {dataStorage.usersData &&
               dataStorage.usersData.map((item) => (
-                <UserCard key={item.id} user={item} />
+                <UserCard key={item.id} user={item} getPosts={dataStorage.getUserPost} posts={dataStorage.userPosts} />
               ))}
           </UsersList>
         </Container>
