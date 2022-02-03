@@ -13,6 +13,7 @@ type User = {
 export class dataStorage {
   usersData: User[] = [];
   userPosts: any [];
+  isLoading = true;
   constructor() {
     makeAutoObservable(this);
   }
@@ -20,6 +21,7 @@ export class dataStorage {
   getUsersAwait = async () => {
     const response = await fetch(apiUrl);
     const data = await response.json();
+    this.isLoading = false;
     return data.data;
   };
 
