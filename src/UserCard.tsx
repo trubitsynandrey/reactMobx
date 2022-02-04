@@ -1,11 +1,11 @@
-import { ReactElement, useState } from "react";
+import React, { ReactElement, useState } from "react";
 import styled from "styled-components";
 import { User } from "./types";
 
 type UserCardProps = {
   user: User;
   getPosts: (id: number) => void;
-  posts: any;
+  posts: number;
 };
 
 const Posts = styled.p<{ isShown: boolean }>`
@@ -17,11 +17,11 @@ const Posts = styled.p<{ isShown: boolean }>`
   opacity: ${({ isShown }) => (isShown ? "100%" : "0")};
 `;
 
-export const UserCard = ({
+export const UserCard = React.forwardRef<any, UserCardProps>(({
   user,
   getPosts,
   posts,
-}: UserCardProps): ReactElement => {
+}, ref): ReactElement => {
   const [isShown, setIsShown] = useState(false);
   const onEmailHover = () => {
     setIsShown(true);
@@ -38,11 +38,11 @@ export const UserCard = ({
       </span>
       <span>{user.gender}</span>
       <span>{user.status}</span>
-      <span>
+      <span ref={ref} style={{textAlign: "center"}}>
         {isShown && (
           <Posts isShown={isShown}>{posts}</Posts>
         )}
       </span>
     </>
   );
-};
+});

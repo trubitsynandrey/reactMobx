@@ -1,27 +1,29 @@
 import { makeAutoObservable, runInAction } from "mobx";
 
 const apiUrl = "https://gorest.co.in/public-api/users";
-const apiPostsUrl = "https://gorest.co.in/public-api/posts?user_id="
+const apiPostsUrl = "https://gorest.co.in/public-api/posts?user_id=";
 type User = {
-    id: number,
-    name: string,
-    email: string,
-    gender: string,
-    status: string,
-}
+  id: number;
+  name: string;
+  email: string;
+  gender: string;
+  status: string;
+};
 
 export class dataStorage {
   usersData: User[] = [];
-  userPosts: any [];
+  userPosts: number;
   isLoading = true;
   constructor() {
     makeAutoObservable(this);
   }
 
-  getUsersAwait = async () => {
-    const response = await fetch(apiUrl);
+  getUsersAwait = async (page) => {
+    const response = await fetch(`${apiUrl}?page=${page}`);
     const data = await response.json();
-    this.isLoading = false;
+    runInAction(() => {
+      this.isLoading = false;
+    });
     return data.data;
   };
 
@@ -29,31 +31,31 @@ export class dataStorage {
     const response = await fetch(`${apiPostsUrl}${id}`);
     const data = await response.json();
     return data.data;
-  }
+  };
 
-  setUsers = apiData => {
-      this.usersData = [...apiData].slice(0, 10);
-  }
+  setUsers = (apiData) => {
+    this.usersData = [...apiData];
+  };
 
-  setUserPosts = apiData => {
-    this.userPosts = apiData.length
-  }
+  setUserPosts = (apiData) => {
+    this.userPosts = apiData.length;
+  };
 
-  getUsers = () => {
-    this.getUsersAwait().then(data => {
+  getUsers = (page=1) => {
+    this.getUsersAwait(page).then((data) => {
       runInAction(() => {
-        this.setUsers(data);
+        this.setUsers([...this.usersData , ...data]);
       });
     });
   };
 
   getUserPost = (id: number) => {
-    this.getUserPostAwait(id).then(data => {
+    this.getUserPostAwait(id).then((data) => {
       runInAction(() => {
-        this.setUserPosts(data)
-      })
-    })
-  }
+        this.setUserPosts(data);
+      });
+    });
+  };
 }
 
 export const dataStorageInstance = new dataStorage();

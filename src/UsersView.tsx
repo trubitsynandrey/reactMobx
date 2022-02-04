@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { ReactElement, useEffect } from "react";
+import { ReactElement, useEffect, useRef, useCallback, useState } from "react";
 import { dataStorage } from "./dataStorage";
 import styled from "styled-components";
 import { UserCard } from "./UserCard.tsx";
@@ -13,7 +13,7 @@ const Wrapper = styled.div`
   justify-content: center;
   padding-left: 20px;
   padding-right: 20px;
-`
+`;
 
 const Container = styled.div`
   display: grid;
@@ -28,39 +28,61 @@ const Container = styled.div`
   }
 `;
 
-
-const User = styled.li`
-  list-style: none;
-`;
-
 export const UsersView = observer(
   ({ dataStorage }: UsersViewProps): ReactElement => {
-    useEffect(() => {
-      dataStorage.getUsers();
+    const [pageNumber, setPageNumber] = useState(1);
+    const watcher = useRef<IntersectionObserver>(null);
+    const lastUserRef = useCallback((node) => {
+      if (watcher.current) watcher.current.disconnect()
+      watcher.current = new IntersectionObserver( entries => {
+        if (entries[0].isIntersecting) {
+          setPageNumber(prevPageNumber => prevPageNumber + 1)
+        }
+      })
+      if (node) watcher.current.observe(node)
     }, []);
 
+    useEffect(() => {
+      dataStorage.getUsers(pageNumber);
+    }, [pageNumber]);
+
     if (dataStorage.isLoading) {
-      return <h2>Loading...</h2>
+      return <h2>Loading...</h2>;
     }
 
     return (
       <Wrapper>
-        {!dataStorage.isLoading && (<Container>
-          <span>Name</span>
-          <span>Email</span>
-          <span>Gender</span>
-          <span>Status</span>
-          <span>Posts</span>
-          {dataStorage.usersData &&
-            dataStorage.usersData.map((item) => (
-              <UserCard
-                key={item.id}
-                user={item}
-                getPosts={dataStorage.getUserPost}
-                posts={dataStorage.userPosts}
-              />
-            ))}
-        </Container>)}
+        {!dataStorage.isLoading && (
+          <Container>
+            <span>Name</span>
+            <span>Email</span>
+            <span>Gender</span>
+            <span>Status</span>
+            <span>Posts</span>
+            {dataStorage.usersData.map((user, index) => {
+              if (dataStorage.usersData.length === index + 1) {
+                return (
+                    <UserCard  
+                      ref={lastUserRef}
+                      key={user.id}
+                      user={user}
+                      getPosts={dataStorage.getUserPost}
+                      posts={dataStorage.userPosts}
+                    />
+                );
+              } else {
+                return (
+                  <UserCard
+                    key={user.id}
+                    user={user}
+                    getPosts={dataStorage.getUserPost}
+                    posts={dataStorage.userPosts}
+                  />
+                );
+              }
+            })}
+          </Container>
+        )}
       </Wrapper>
     );
   }
