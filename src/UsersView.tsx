@@ -10,6 +10,7 @@ type UsersViewProps = {
 
 const Wrapper = styled.div`
   display: flex;
+  flex-direction: column;
   justify-content: center;
   padding-left: 20px;
   padding-right: 20px;
@@ -30,9 +31,11 @@ const Container = styled.div`
 
 export const UsersView = observer(
   ({ dataStorage }: UsersViewProps): ReactElement => {
+    const isLoading = dataStorage.isLoading;
     const [pageNumber, setPageNumber] = useState(1);
     const watcher = useRef<IntersectionObserver>(null);
     const lastUserRef = useCallback((node) => {
+      if (isLoading) return;
       if (watcher.current) watcher.current.disconnect()
       watcher.current = new IntersectionObserver( entries => {
         if (entries[0].isIntersecting) {
@@ -40,19 +43,14 @@ export const UsersView = observer(
         }
       })
       if (node) watcher.current.observe(node)
-    }, []);
+    }, [isLoading]);
 
     useEffect(() => {
       dataStorage.getUsers(pageNumber);
     }, [pageNumber]);
 
-    if (dataStorage.isLoading) {
-      return <h2>Loading...</h2>;
-    }
-
     return (
       <Wrapper>
-        {!dataStorage.isLoading && (
           <Container>
             <span>Name</span>
             <span>Email</span>
@@ -82,7 +80,7 @@ export const UsersView = observer(
               }
             })}
           </Container>
-        )}
+          {isLoading && <h2>the content is loading...</h2>}
       </Wrapper>
     );
   }

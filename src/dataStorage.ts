@@ -19,11 +19,11 @@ export class dataStorage {
   }
 
   getUsersAwait = async (page) => {
+    runInAction(() => {
+      this.isLoading = true;
+    });
     const response = await fetch(`${apiUrl}?page=${page}`);
     const data = await response.json();
-    runInAction(() => {
-      this.isLoading = false;
-    });
     return data.data;
   };
 
@@ -45,6 +45,7 @@ export class dataStorage {
     this.getUsersAwait(page).then((data) => {
       runInAction(() => {
         this.setUsers([...this.usersData , ...data]);
+        this.isLoading = false;
       });
     });
   };
