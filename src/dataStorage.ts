@@ -14,6 +14,7 @@ export class dataStorage {
   usersData: User[] = [];
   userPosts: number;
   isLoading = true;
+  postsLoading = true;
   constructor() {
     makeAutoObservable(this);
   }
@@ -28,6 +29,9 @@ export class dataStorage {
   };
 
   getUserPostAwait = async (id: number) => {
+    runInAction(() => {
+      this.postsLoading = true;
+    });
     const response = await fetch(`${apiPostsUrl}${id}`);
     const data = await response.json();
     return data.data;
@@ -53,6 +57,7 @@ export class dataStorage {
   getUserPost = (id: number) => {
     this.getUserPostAwait(id).then((data) => {
       runInAction(() => {
+          this.postsLoading = false;
         this.setUserPosts(data);
       });
     });

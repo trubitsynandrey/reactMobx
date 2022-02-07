@@ -11,15 +11,14 @@ type UsersViewProps = {
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding-left: 20px;
-  padding-right: 20px;
+  padding-left: 40px;
+  padding-right: 40px;
 `;
 
 const Container = styled.div`
   display: grid;
-  max-width: 1200px;
-  grid-template-columns: repeat(2, 1fr) 0.5fr 0.5fr 0.2fr;
+  max-width: 1400px;
+  grid-template-columns: repeat(2, auto) 0.1fr 0.1fr 0.1fr;
   border-top: 1px solid black;
   border-right: 1px solid black;
   & > span {
@@ -28,6 +27,17 @@ const Container = styled.div`
     border-bottom: 1px solid black;
   }
 `;
+
+const TableCellHeader = styled.div`
+  border-left: 1px solid black;
+  border-bottom: 1px solid black;
+  background-color: #cba5ee;
+  height: 36px;
+  text-align: center;
+  position: sticky;
+  top: 0;
+`
+
 
 export const UsersView = observer(
   ({ dataStorage }: UsersViewProps): ReactElement => {
@@ -52,11 +62,11 @@ export const UsersView = observer(
     return (
       <Wrapper>
           <Container>
-            <span>Name</span>
-            <span>Email</span>
-            <span>Gender</span>
-            <span>Status</span>
-            <span>Posts</span>
+            <TableCellHeader>Name</TableCellHeader>
+            <TableCellHeader>Email</TableCellHeader>
+            <TableCellHeader>Gender</TableCellHeader>
+            <TableCellHeader>Status</TableCellHeader>
+            <TableCellHeader>Posts</TableCellHeader>
             {dataStorage.usersData.map((user, index) => {
               if (dataStorage.usersData.length === index + 1) {
                 return (
@@ -66,6 +76,7 @@ export const UsersView = observer(
                       user={user}
                       getPosts={dataStorage.getUserPost}
                       posts={dataStorage.userPosts}
+                      postsIsLoading={dataStorage.postsLoading}
                     />
                 );
               } else {
